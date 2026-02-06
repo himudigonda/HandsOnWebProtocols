@@ -10,7 +10,7 @@ The **Protocol Battle Arena** is a comprehensive lab designed to pit web protoco
 
 1. **Clone and Install**:
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/himudigonda/HandsOnWebProtocols
    cd HandsOnWebProtocols
    uv sync
    ```
@@ -115,5 +115,3 @@ pkill -f "src/servers"
 - **Siege** (Optional, for advanced throughput metrics)
 
 ---
-
-*Built with ❤️ in the Protocol Battle Arena.*
