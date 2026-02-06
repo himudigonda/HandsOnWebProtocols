@@ -1,0 +1,26 @@
+[project]
+name = "protocol-lab"
+version = "0.1.0"
+description = "A hands-on lab for various application layer protocols."
+requires-python = ">=3.12"
+dependencies = [
+    "uvicorn[standard]",
+    "fastapi",
+    "sqlalchemy[asyncio]",
+    "pydantic",
+    "strawberry-graphql",
+    "grpcio",
+    "grpcio-tools",
+    "websockets",
+    "aiortc",
+    "python-multipart", # Required by FastAPI for form data, good to include
+    "httpx", # For client-side HTTP requests in benchmarks/clients
+    "aiosqlite>=0.22.1",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages]
+find = {where = ["src"]}

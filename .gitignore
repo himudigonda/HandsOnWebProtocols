@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Distribution / Packaging
+build/
+dist/
+*.egg-info/
+
+# Project Specific
+logs/
+data/*.db
+data/*.sqlite
+
+# Generated gRPC code (optional, but good practice if generated on build)
+src/servers/protos/*_pb2.py
+src/servers/protos/*_pb2_grpc.py
+
+# Editor / System
+.DS_Store
+.idea/
+.vscode/
+*.swp
