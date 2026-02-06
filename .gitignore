@@ -27,3 +27,4 @@ src/servers/protos/*_pb2_grpc.py
 .idea/
 .vscode/
 *.swp
+dumper.sh

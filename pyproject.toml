@@ -16,6 +16,9 @@ dependencies = [
     "python-multipart", # Required by FastAPI for form data, good to include
     "httpx", # For client-side HTTP requests in benchmarks/clients
     "aiosqlite>=0.22.1",
+    "rich>=14.3.2",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
 ]
 
 [build-system]

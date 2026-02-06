@@ -42,6 +42,10 @@ async def fake_data_stream():
 
 "
 
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "sse"}
+
 @app.get("/stream")
 async def stream_logs():
     return StreamingResponse(fake_data_stream(), media_type="text/event-stream")
