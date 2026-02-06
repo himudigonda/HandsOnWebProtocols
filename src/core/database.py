@@ -1,36 +1,40 @@
-import datetime
-from sqlalchemy import Column, Integer, String, DateTime, func
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+import os
+
+from sqlalchemy import Column, DateTime, Integer, String, Text, func, select
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 
-DATABASE_URL = "sqlite+aiosqlite:///./data/app.db"
+DB_PATH = "./data/arena.db"
+DATABASE_URL = f"sqlite+aiosqlite:///{DB_PATH}"
 
 Base = declarative_base()
 
-class ActivityLog(Base):
-    __tablename__ = "user_activity_logs"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, nullable=False)
-    action = Column(String, nullable=False)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
-    metadata_json = Column(String) # Storing JSON as TEXT
+class DBLog(Base):
+    __tablename__ = "logs"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, index=True)
+    action = Column(String)
+    timestamp = Column(DateTime, index=True)
     ip_address = Column(String)
+    metadata_json = Column(Text)
 
-    def __repr__(self):
-        return f"<ActivityLog(id={self.id}, user_id={self.user_id}, action='{self.action}')>"
 
-# Async Engine and Session Local
-engine = create_async_engine(DATABASE_URL, echo=True)
-AsyncSessionLocal = async_sessionmaker(
-    autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
-)
+engine = create_async_engine(DATABASE_URL)
+AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+
+
+async def get_db_stats():
+    """Returns row count for dashboard verification"""
+    if not os.path.exists(DB_PATH):
+        return 0
+    try:
+        async with AsyncSessionLocal() as session:
+            return await session.scalar(select(func.count()).select_from(DBLog))
+    except Exception:
+        return 0
+
 
 async def init_db():
     async with engine.begin() as conn:
-        # Create tables from schema.sql if not exists
-        # Note: We are using a declarative base, so Base.metadata.create_all is more idiomatic
-        # However, the project plan explicitly mentions schema.sql, so we'll simulate that for now
-        # For a more robust solution, consider Alembic migrations
         await conn.run_sync(Base.metadata.create_all)
-

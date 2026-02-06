@@ -1,33 +1,32 @@
+from typing import List
+
 import strawberry
 from fastapi import FastAPI
 from sqlalchemy import desc, select
 from strawberry.fastapi import GraphQLRouter
 
-from src.core.database import ActivityLog, AsyncSessionLocal
+from src.core.database import AsyncSessionLocal, DBLog
 
 
-# 1. Define the GraphQL Type (Schema)
 @strawberry.type
 class LogType:
     id: int
-    user_id: int  # Changed from str to int based on ActivityLog model
+    user_id: int
     action: str
     timestamp: str
     ip_address: str
     metadata_json: str
 
 
-# 2. Define the Resolver
 @strawberry.type
 class Query:
     @strawberry.field
-    async def logs(self, limit: int = 100) -> list[LogType]:
+    async def logs(self, limit: int = 100) -> List[LogType]:
         async with AsyncSessionLocal() as session:
             result = await session.execute(
-                select(ActivityLog).order_by(desc(ActivityLog.timestamp)).limit(limit)
+                select(DBLog).order_by(desc(DBLog.timestamp)).limit(limit)
             )
             data = result.scalars().all()
-            # Convert SQLAlchemy models to Strawberry Types
             return [
                 LogType(
                     id=d.id,
@@ -42,19 +41,16 @@ class Query:
 
 
 schema = strawberry.Schema(query=Query)
-graphql_app = GraphQLRouter(schema)
-
-app = FastAPI(title="GraphQL Server")
-app.include_router(graphql_app, prefix="/graphql")
+app = FastAPI(title="Arena GraphQL Server")
+app.include_router(GraphQLRouter(schema), prefix="/graphql")
 
 
 @app.get("/health")
-async def health_check():
-    return {"status": "healthy", "service": "graphql"}
+async def health():
+    return {"status": "healthy"}
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    # Run on port 8001
     uvicorn.run(app, host="0.0.0.0", port=8001)

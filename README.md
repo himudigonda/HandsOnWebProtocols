@@ -1,103 +1,119 @@
-# Protocol Lab
+# ⚔️ Protocol Battle Arena
 
-A hands-on lab for comparing various application layer protocols (REST, GraphQL, gRPC) with benchmarks.
+**An advanced, high-performance benchmarking suite for modern application protocols.**
 
-## Prerequisites
+The **Protocol Battle Arena** is a comprehensive lab designed to pit web protocols against each other in real-world scenarios. It features a professional-grade Streamlit dashboard, automated server orchestration, and deep performance analytics.
 
-- [uv](https://github.com/astral-sh/uv) (for Python package management)
-- Python 3.12+
+![Dashboard Preview](docs/dashboard_preview.png)
 
-## Installation
+## 🚀 Quick Start
 
-1. **Install dependencies:**
-
+1. **Clone and Install**:
    ```bash
+   git clone <repo-url>
+   cd HandsOnWebProtocols
    uv sync
    ```
 
-2. **Make scripts executable:**
-
+2. **Launch the Arena**:
    ```bash
-   chmod +x start_servers.sh
+   uv run streamlit run src/dashboard/app.py
    ```
 
-## Setup (Protobuf Generation)
+---
 
-You need to generate the gRPC code from the protocol buffer definitions.
+## 🏗️ Core Architecture
 
-1. **Generate gRPC code:**
+### **The Control Tower**
 
-   ```bash
-   uv run python -m grpc_tools.protoc -I. --python_out=src/servers --grpc_python_out=src/servers protos/logs.proto
-   ```
+Managed by a robust `ServerManager` singleton, the dashboard allows you to ignite or quench protocol servers with a single toggle.
 
-2. **Fix Generated Import Issue:**
+- **Port-based Health Checks**: Automatic detection of server readiness.
+- **Live Resource Tracking**: Real-time CPU and Memory (RSS) monitoring for every server process using `psutil`.
+- **Fault-Tolerant Cleanup**: Integrated `pkill` and `lsof` logic to ensure no zombie processes remain.
 
-   The generated gRPC code uses an absolute import that doesn't resolve correctly in this structure. Apply this fix:
+### **The Data Layer**
 
-   ```bash
-   sed -i '' 's/from protos import logs_pb2/from . import logs_pb2/' src/servers/protos/logs_pb2_grpc.py
-   ```
+Powered by an optimized SQLite database with **100,000+ records**.
 
-## Running the Servers
+- **Batch Seeding**: High-speed data generation via `src/scripts/generate.py`.
+- **Indexed Queries**: Optimized for high-concurrency read operations during stress tests.
 
-Start all servers (REST, GraphQL, SSE, WebSockets, gRPC) in the background:
+---
+
+## 📡 Supported Protocols
+
+| Protocol | Port | Implementation | Typical Use Case |
+| :--- | :--- | :--- | :--- |
+| **REST** | `8000` | FastAPI + SQLAlchemy | Standard internal/external APIs |
+| **GraphQL** | `8001` | Strawberry + FastAPI | Flexible, sparse data fetching |
+| **gRPC** | `50051` | Protobuf + HTTP/2 | High-performance microservices |
+| **SSE** | `8002` | FastAPI Streaming | One-way real-time updates |
+| **WebSockets** | `8003` | FastAPI WebSockets | Full-duplex interactive streams |
+
+---
+
+## 📊 Benchmarking Suite
+
+### **1. Latency Distribution (TTFB)**
+
+Measures **Time to First Byte** across sequential requests. Visualized using interactive Plotly box plots to show P50/P95 distribution and outliers.
+
+![Latency Chart](docs/latency_chart.png)
+
+### **2. Throughput Siege (RPS)**
+
+A high-concurrency saturation test that hammers servers to find their breaking point.
+
+- Integrated with `Siege` patterns.
+- Live progress bars and dynamic bar charts.
+
+![Throughput Chart](docs/throughput_chart.png)
+
+---
+
+## 🛠️ Advanced Usage & Engineering
+
+### **Maintenance Controls**
+
+The Engineering tab provides tools for database re-seeding and architectural insights.
+
+![Engineering Tab](docs/engineering_tab.png)
+
+### **Manual Data Generation**
+
+To re-seed the arena with a specific row count:
 
 ```bash
-./start_servers.sh
+PYTHONPATH=. uv run python src/scripts/generate.py
 ```
 
-This will start:
-
-- **REST API**: `http://localhost:8000`
-- **GraphQL API**: `http://localhost:8001`
-- **SSE Stream**: `http://localhost:8002`
-- **WebSocket**: `ws://localhost:8003`
-- **gRPC Server**: `localhost:50051`
-
-Logs are written to the `logs/` directory.
-
-## Advanced Benchmarking & Scaling
-
-The project has been scaled to **1,400,000+ records** to test protocol efficiency under real-world load.
-
-### New Features
-
-- **SSE (Server-Sent Events)**: Streaming logs on port `8002`.
-- **WebSockets**: Interactive filtered streams on port `8003`.
-- **Advanced Benchmark Suite**: Multi-category testing (Latency, Concurrency, Throughput).
-- **Rich Visualization**: Terminal-based reporting using `rich`.
-
-### Running Advanced Benchmarks
+### **Running Tests**
 
 ```bash
-PYTHONPATH=. uv run python src/benchmarks/advanced_benchmark.py
+uv run pytest tests/
 ```
 
-### Interactive Demo (SSE & WebSockets)
+### **Manual Server Control**
 
-Experience real-time streaming:
-
-```bash
-PYTHONPATH=. uv run python src/client/interactive_demo.py
-```
-
-### Running Tests
-
-Ensure servers are running, then:
+If you prefer the CLI:
 
 ```bash
-PYTHONPATH=. uv run pytest tests/
-```
+# Start a specific server
+PYTHONPATH=. uv run python src/servers/rest.py
 
-### Technical Scalability
-
-The database seeding uses optimized SQL batching to achieve high insertion speeds for millions of rows in SQLite.
-
-## Stopping Servers
-
-The `start_servers.sh` script runs servers in the background. To stop them:
-
-```bash
+# Force stop everything
 pkill -f "src/servers"
 ```
+
+---
+
+## 🧪 Requirements
+
+- **Python 3.12+**
+- **uv** (Recommended for dependency management)
+- **Siege** (Optional, for advanced throughput metrics)
+
+---
+
+*Built with ❤️ in the Protocol Battle Arena.*

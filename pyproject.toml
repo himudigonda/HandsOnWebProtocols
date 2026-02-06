@@ -19,6 +19,11 @@ dependencies = [
     "rich>=14.3.2",
     "pytest>=9.0.2",
     "pytest-asyncio>=1.3.0",
+    "streamlit>=1.54.0",
+    "pandas>=2.3.3",
+    "plotly>=6.5.2",
+    "psutil>=7.2.2",
+    "faker>=40.1.2",
 ]
 
 [build-system]
